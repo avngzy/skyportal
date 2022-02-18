@@ -17,7 +17,6 @@ import sqlalchemy as sa
 from sqlalchemy.sql import column, Values
 from sqlalchemy.orm import joinedload
 from sqlalchemy import and_
-from sqlalchemy.orm import sessionmaker, scoped_session
 
 from baselayer.app.access import permissions, auth_or_token
 from baselayer.app.env import load_env
@@ -49,7 +48,6 @@ _, cfg = load_env()
 
 
 log = make_log('api/photometry')
-Session = scoped_session(sessionmaker(bind=DBSession.session_factory.kw["bind"]))
 
 
 def save_data_using_copy(rows, table, columns):
@@ -292,7 +290,7 @@ def standardize_photometry_data(data):
         for field in PhotMagFlexible.required_keys:
             missing = df[field].isna()
             if any(missing):
-                first_offender = np.argwhere(missing)[0, 0]
+                first_offender = np.argwhere(missing.values)[0, 0]
                 packet = df.iloc[first_offender].to_dict()
 
                 # coerce nans to nones
